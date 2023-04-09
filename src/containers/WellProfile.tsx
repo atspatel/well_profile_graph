@@ -81,14 +81,15 @@ function LineGraph(props: {
     }
   });
 
+  // Added for reference only. Ignore
   var x_axis_points = [
-    new THREE.Vector3(-400, 0, -props.wellTD - 20),
-    new THREE.Vector3(400, 0, -props.wellTD - 20),
+    new THREE.Vector3(0, 0, -props.wellTD - 20),
+    new THREE.Vector3(500, 0, -props.wellTD - 20),
   ];
   const x_axis = new THREE.BufferGeometry().setFromPoints(x_axis_points);
   var y_axis_points = [
-    new THREE.Vector3(0, -400, -props.wellTD - 20),
-    new THREE.Vector3(0, 400, -props.wellTD - 20),
+    new THREE.Vector3(0, 0, -props.wellTD - 20),
+    new THREE.Vector3(0, 500, -props.wellTD - 20),
   ];
   const y_axis = new THREE.BufferGeometry().setFromPoints(y_axis_points);
   var z_axis_points = [
@@ -116,36 +117,14 @@ function LineGraph(props: {
             attach={"material"}
           />
         </line>
-      </mesh>
-      <mesh {...props}>
+
+        {/* Added for reference only.. Ignore*/}
         {/* @ts-ignore */}
-        <line geometry={x_axis}>
-          <lineBasicMaterial
-            vertexColors={false}
-            color={"#FF0000"}
-            attach={"material"}
-          />
-        </line>
-      </mesh>
-      <mesh {...props}>
+        <line geometry={x_axis} />
         {/* @ts-ignore */}
-        <line geometry={y_axis}>
-          <lineBasicMaterial
-            vertexColors={false}
-            color={"#00FF00"}
-            attach={"material"}
-          />
-        </line>
-      </mesh>
-      <mesh {...props}>
+        <line geometry={y_axis} />
         {/* @ts-ignore */}
-        <line geometry={z_axis}>
-          <lineBasicMaterial
-            vertexColors={false}
-            color={"#0000FF"}
-            attach={"material"}
-          />
-        </line>
+        <line geometry={z_axis} />
       </mesh>
     </>
   );

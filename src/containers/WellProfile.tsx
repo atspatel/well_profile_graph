@@ -45,13 +45,11 @@ function exampleLineCalc(
   radX: number
 ) {
   const [x, y, z, density] = dataPoint;
-
   const margin = 10; // to have margin between tube boundary and line, set 0 to attach line to tube boundary
   const r = lithoTubeRadius / 2 + density * 10 + margin;
 
   const calcedPos = [x + r * Math.cos(radX), y + r * Math.sin(radX), -z];
-  const calcedVector = new THREE.Vector3(...calcedPos);
-  return calcedVector;
+  return calcedPos;
 }
 
 function LineGraph(props: {
@@ -62,11 +60,11 @@ function LineGraph(props: {
   const controlsRef = useRef<OrbitControlsImpl>(null);
   const lithoTubeRadius = 5;
 
-  var points = props.path.map((point: any) =>
-    exampleLineCalc(point, lithoTubeRadius, 0)
+  var points = props.path.map(
+    (point: any) =>
+      new THREE.Vector3(...exampleLineCalc(point, lithoTubeRadius, 0))
   );
   const lineGeometry = new THREE.BufferGeometry().setFromPoints(points);
-
   useFrame((state) => {
     if (controlsRef.current) {
       state.camera.position.z = -props.wellTD / 2;
@@ -76,11 +74,28 @@ function LineGraph(props: {
       const radX = controlsRef.current.getAzimuthalAngle();
       for (let i = 0; i < points.length; i++) {
         const pos = exampleLineCalc(props.path[i], lithoTubeRadius, radX);
-        points[i].copy(pos);
+        const [x, y, z] = pos;
+        points[i].set(x, y, z);
       }
       lineGeometry.setFromPoints(points);
     }
   });
+
+  var x_axis_points = [
+    new THREE.Vector3(-400, 0, -props.wellTD - 20),
+    new THREE.Vector3(400, 0, -props.wellTD - 20),
+  ];
+  const x_axis = new THREE.BufferGeometry().setFromPoints(x_axis_points);
+  var y_axis_points = [
+    new THREE.Vector3(0, -400, -props.wellTD - 20),
+    new THREE.Vector3(0, 400, -props.wellTD - 20),
+  ];
+  const y_axis = new THREE.BufferGeometry().setFromPoints(y_axis_points);
+  var z_axis_points = [
+    new THREE.Vector3(0, 0, -props.wellTD - 20),
+    new THREE.Vector3(0, 0, 0),
+  ];
+  const z_axis = new THREE.BufferGeometry().setFromPoints(z_axis_points);
 
   return (
     <>
@@ -102,6 +117,36 @@ function LineGraph(props: {
           />
         </line>
       </mesh>
+      <mesh {...props}>
+        {/* @ts-ignore */}
+        <line geometry={x_axis}>
+          <lineBasicMaterial
+            vertexColors={false}
+            color={"#FF0000"}
+            attach={"material"}
+          />
+        </line>
+      </mesh>
+      <mesh {...props}>
+        {/* @ts-ignore */}
+        <line geometry={y_axis}>
+          <lineBasicMaterial
+            vertexColors={false}
+            color={"#00FF00"}
+            attach={"material"}
+          />
+        </line>
+      </mesh>
+      <mesh {...props}>
+        {/* @ts-ignore */}
+        <line geometry={z_axis}>
+          <lineBasicMaterial
+            vertexColors={false}
+            color={"#0000FF"}
+            attach={"material"}
+          />
+        </line>
+      </mesh>
     </>
   );
 }
@@ -109,11 +154,9 @@ function LineGraph(props: {
 function WellProfile() {
   const [csvData, setCsvData] = useState<{}[]>([]);
   const wellPad: [number, number, number] = [0, 0, 0];
-  // const wellName: string = "Dummy Well";
   const [wellPath, setWellPath] = useState<
     null | [number, number, number, number][]
   >(null);
-
   const wellTD = (wellPath && wellPath.at(-1)?.[2]) || 500;
   THREE.Object3D.DefaultUp.set(0, 0, 1);
 
